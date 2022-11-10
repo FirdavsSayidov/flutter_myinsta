@@ -1,12 +1,15 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_myinsta/pages/MyfeedPage.dart';
 import 'package:image_picker/image_picker.dart';
 
 
-class MyUploadPage extends StatefulWidget {
-  const MyUploadPage({Key? key}) : super(key: key);
 
+class MyUploadPage extends StatefulWidget {
+
+   
+    var pageController = PageController();
   @override
   State<MyUploadPage> createState() => _MyUploadPageState();
 }
@@ -15,7 +18,9 @@ class _MyUploadPageState extends State<MyUploadPage> {
   var captionController = TextEditingController();
 
   File? _image;
+
   final picker = ImagePicker();
+
 
   Future _getImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -23,6 +28,7 @@ class _MyUploadPageState extends State<MyUploadPage> {
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
+
       } else {
         print('No image selected.');
       }
@@ -30,6 +36,15 @@ class _MyUploadPageState extends State<MyUploadPage> {
   }
   @override
   Widget build(BuildContext context) {
+
+    gotoScreen(){
+      Navigator.push(
+          context, MaterialPageRoute(
+          builder: (context){
+             return MyFeedPage(pageController: widget.pageController,);
+          }));
+    }
+
     return Scaffold(backgroundColor: Colors.white,
     appBar: AppBar(
       elevation: 0,
@@ -37,9 +52,7 @@ class _MyUploadPageState extends State<MyUploadPage> {
       backgroundColor: Colors.white,
     actions: [
       IconButton(onPressed: (){
-        setState(() {
-          _image = null;
-        });
+     gotoScreen();
       }, icon: Icon(Icons.post_add,color: Colors.red,))
     ],
     ),
@@ -53,14 +66,25 @@ class _MyUploadPageState extends State<MyUploadPage> {
                 width: double.infinity,
                 height: MediaQuery.of(context).size.width,
                 color: Colors.grey.shade300,
+
                 child: _image ==null ? Center(
                   child: Icon(Icons.add_a_photo,size: 50,color: Colors.grey,),
                 ):
                     Stack(
                       children: [
-                        Image.file(_image!,width: double.infinity,height: double.infinity,fit: BoxFit.cover,)
+                        Image.file(_image!,width: double.infinity,height: double.infinity,fit: BoxFit.cover,),
+                        Row(mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(onPressed: (){
+                             setState(() {
+                               _image = null;
+                             });
+                            }, icon: Icon(Icons.highlight_remove_outlined,color: Colors.white,))
+                          ],
+                        )
                       ],
-                    )
+                    ),
+
               ),
             ),
             Container(

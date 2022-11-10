@@ -1,12 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'myfeedPage.dart';
-import 'mylikes_page.dart';
-import 'myprofil_page.dart';
-import 'mysearch_page.dart';
-import 'myupload_page.dart';
-
+import 'package:flutter_myinsta/pages/myfeedPage.dart';
+import 'package:flutter_myinsta/pages/mylikes_page.dart';
+import 'package:flutter_myinsta/pages/myprofil_page.dart';
+import 'package:flutter_myinsta/pages/mysearch_page.dart';
+import 'package:flutter_myinsta/pages/myupload_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -31,7 +29,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: PageView(controller: _pageController,
         children: [
-          MyFeedPage(),
+          MyFeedPage(pageController:_pageController),
           MySearchPage(),
           MyUploadPage(),
           MyLikesPage(),
