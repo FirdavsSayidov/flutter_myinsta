@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_myinsta/image/images.dart';
 import 'package:flutter_myinsta/model/post_model.dart';
 import 'package:flutter_myinsta/services/auth_services.dart';
+import 'package:image_picker/image_picker.dart';
 
 class MyProfilPage extends StatefulWidget {
   const MyProfilPage({super.key});
@@ -14,6 +17,8 @@ class MyProfilPage extends StatefulWidget {
 }
 
 class _MyProfilPageState extends State<MyProfilPage> {
+  File? _image;
+  final ImagePicker _picker = ImagePicker();
  List<Post> items = [];
  String post_img1 = 'https://firebasestorage.googleapis.com/v0/b/koreanguideway.appspot.com/o/develop%2Fpost.png?alt=media&token=f0b1ba56-4bf4-4df2-9f43-6b8665cdc964';
  String post_img2 = 'https://firebasestorage.googleapis.com/v0/b/koreanguideway.appspot.com/o/develop%2Fpost2.png?alt=media&token=ac0c131a-4e9e-40c0-a75a-88e586b28b72';
@@ -24,8 +29,60 @@ class _MyProfilPageState extends State<MyProfilPage> {
    items.add(Post(caption: 'Discover more great images on our sponsor`s site', postImage: post_img1));
    items.add(Post(caption: 'Discover more great images on our sponsor`s site', postImage: post_img2));
 
-
  }
+
+
+  _imgFromGallery() async {
+    XFile? image =
+    await _picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
+    print(image!.path.toString());
+    setState(() {
+      _image = File(image.path);
+    });
+   // _apiChangePhoto();
+  }
+
+  _imgFromCamera() async {
+    XFile? image =
+    await _picker.pickImage(source: ImageSource.camera, imageQuality: 50);
+    print(image!.path.toString());
+    setState(() {
+      _image = File(image.path);
+    });
+    //_apiChangePhoto();
+  }
+
+
+  void _showPicker(context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return SafeArea(
+            child: Container(
+              child: Wrap(
+                children: <Widget>[
+                  ListTile(
+                      leading:  Icon(Icons.photo_library),
+                      title:  Text('Pick Photo'),
+                      onTap: () {
+                        _imgFromGallery();
+                        Navigator.of(context).pop();
+                      }),
+                   ListTile(
+                    leading:  const Icon(Icons.photo_camera),
+                    title:  const Text('Take Photo'),
+                    onTap: () {
+                      _imgFromCamera();
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -59,25 +116,33 @@ class _MyProfilPageState extends State<MyProfilPage> {
                   child: Expanded(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(70),
-                      child: Image(
+                      child: _image == null ? Image(
                         height: 80,
                         width: 80,
                         image: AssetImage(imageAll[0]),
-                      ),
+                      ):
+                          Image.file(_image!,
+                            height: 80,width: 80,
+                            fit: BoxFit.cover,)
                     ),
                   ),
                 ),
 
-                Container(height: 80,width: 80,
-                    margin: EdgeInsets.all(7),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Icon(Icons.add_circle,color: Colors.purple),
-                    Container()
-                  ],
-                )),
+                GestureDetector(
+                  onTap: (){
+                    _showPicker(context);
+                  },
+                  child: Container(height: 80,width: 80,
+                      margin: EdgeInsets.all(7),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Icon(Icons.add_circle,color: Colors.purple),
+                      Container()
+                    ],
+                  )),
+                ),
               ],
             ),
             SizedBox(height: 15),

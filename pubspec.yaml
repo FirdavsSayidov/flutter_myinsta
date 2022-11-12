@@ -21,6 +21,7 @@ dependencies:
   firebase_database:
   firebase_storage:
   image_picker:
+  cloud_firestore:
 
 
 dev_dependencies:

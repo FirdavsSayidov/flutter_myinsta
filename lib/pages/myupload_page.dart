@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_myinsta/pages/MyfeedPage.dart';
 import 'package:image_picker/image_picker.dart';
 
 
@@ -10,6 +9,7 @@ class MyUploadPage extends StatefulWidget {
 
    
     var pageController = PageController();
+    MyUploadPage({required this.pageController});
   @override
   State<MyUploadPage> createState() => _MyUploadPageState();
 }
@@ -20,30 +20,62 @@ class _MyUploadPageState extends State<MyUploadPage> {
   File? _image;
 
   final picker = ImagePicker();
-
-
-  Future _getImage() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
+  _imgFromGallery() async {
+    XFile? image =
+    await picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
+    print(image!.path.toString());
     setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
-
-      } else {
-        print('No image selected.');
-      }
+      _image = File(image.path);
     });
+    // _apiChangePhoto();
   }
+
+  _imgFromCamera() async {
+    XFile? image =
+    await picker.pickImage(source: ImageSource.camera, imageQuality: 50);
+    print(image!.path.toString());
+    setState(() {
+      _image = File(image.path);
+    });
+    //_apiChangePhoto();
+  }
+
+
+
+  void _showPicker(context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return SafeArea(
+            child: Container(
+              child: Wrap(
+                children: <Widget>[
+                  ListTile(
+                      leading:  Icon(Icons.photo_library),
+                      title:  Text('Pick Photo'),
+                      onTap: () {
+                        _imgFromGallery();
+                        Navigator.of(context).pop();
+                      }),
+                  ListTile(
+                    leading:  const Icon(Icons.photo_camera),
+                    title:  const Text('Take Photo'),
+                    onTap: () {
+                      _imgFromCamera();
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
 
-    gotoScreen(){
-      Navigator.push(
-          context, MaterialPageRoute(
-          builder: (context){
-             return MyFeedPage(pageController: widget.pageController,);
-          }));
-    }
+
 
     return Scaffold(backgroundColor: Colors.white,
     appBar: AppBar(
@@ -52,7 +84,8 @@ class _MyUploadPageState extends State<MyUploadPage> {
       backgroundColor: Colors.white,
     actions: [
       IconButton(onPressed: (){
-     gotoScreen();
+     widget.pageController.animateToPage(0, duration: Duration(microseconds: 1), curve: Curves.bounceIn);
+
       }, icon: Icon(Icons.post_add,color: Colors.red,))
     ],
     ),
@@ -60,7 +93,7 @@ class _MyUploadPageState extends State<MyUploadPage> {
         child: Column(
           children: [
             GestureDetector(onTap: (){
-              _getImage();
+              _showPicker(context);
             },
               child: Container(
                 width: double.infinity,
