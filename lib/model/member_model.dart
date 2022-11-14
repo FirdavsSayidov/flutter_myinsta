@@ -1,5 +1,4 @@
-
-class Userr{
+class Member {
   String uid = "";
   String fullname = "";
   String email = "";
@@ -14,9 +13,9 @@ class Userr{
   int followers_count = 0;
   int following_count = 0;
 
-  Userr({required this.fullname, required this.email});
+  Member(this.fullname, this.email);
 
-  Userr.fromJson(Map<String, dynamic> json)
+  Member.fromJson(Map<String, dynamic> json)
       : uid = json['uid'],
         fullname = json['fullname'],
         email = json['email'],

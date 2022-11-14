@@ -11,17 +11,20 @@ dependencies:
   flutter:
     sdk: flutter
 
-  cupertino_icons: ^1.0.2
-  eva_icons_flutter: ^3.1.0
+  cupertino_icons:
+  fluttertoast:
+  image_picker:
   cached_network_image:
+  eva_icons_flutter:
   firebase_core:
   firebase_auth:
-  shared_preferences:
-  fluttertoast:
-  firebase_database:
-  firebase_storage:
-  image_picker:
   cloud_firestore:
+  firebase_storage:
+  platform_device_id:
+  firebase_messaging:
+  flutter_local_notifications: ^9.4.0
+  shared_preferences:
+  logger:
 
 
 dev_dependencies:
