@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 
 import '../model/post_model.dart';
@@ -62,7 +63,7 @@ class _MyFeedPageState extends State<MyFeedPage> {
 
   _dialogRemovePost(Post post) async {
     var result = await Utils.dialogCommon(
-        context, "Insta Clone", "Do you want to remove this post?", false);
+        context, "flutter_myinsta", "Do you want to remove this post?", false);
     if (result != null && result) {
       setState(() {
         isLoading = true;
@@ -221,7 +222,9 @@ class _MyFeedPageState extends State<MyFeedPage> {
                           ),
                   ),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Share.share(post.img_post);
+                    },
                     icon: Icon(
                       EvaIcons.shareOutline,
                     ),

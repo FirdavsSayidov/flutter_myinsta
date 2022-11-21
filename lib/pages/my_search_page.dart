@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_myinsta/pages/second_screen.dart';
+import 'package:flutter_myinsta/pages/user_page.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../model/member_model.dart';
 import '../services/db_service.dart';
+import '../services/local_notification_service.dart';
 
 class MySearchPage extends StatefulWidget {
   const MySearchPage({Key? key}) : super(key: key);
@@ -15,6 +19,10 @@ class _MySearchPageState extends State<MySearchPage> {
   var searchController = TextEditingController();
   List<Member> items = [];
 
+  late final LocalNotificationService service;
+
+
+
   void _apiSearchMembers(String keyword) {
     setState(() {
       isLoading = true;
@@ -23,6 +31,8 @@ class _MySearchPageState extends State<MySearchPage> {
           _respSearchMembers(users),
         });
   }
+
+
 
   void _respSearchMembers(List<Member> members) {
     setState(() {
@@ -57,6 +67,9 @@ class _MySearchPageState extends State<MySearchPage> {
 
   @override
   void initState() {
+    service = LocalNotificationService();
+    service.intialize();
+    listenToNotification();
     super.initState();
     _apiSearchMembers("");
   }
@@ -133,21 +146,25 @@ class _MySearchPageState extends State<MySearchPage> {
                 color: Color.fromRGBO(193, 53, 132, 1),
               ),
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(22.5),
-              child: member.img_url.isEmpty
-                  ? Image(
-                      image: AssetImage("assets/images/person.png"),
-                      width: 45,
-                      height: 45,
-                      fit: BoxFit.cover,
-                    )
-                  : Image.network(
-                      member.img_url,
-                      width: 45,
-                      height: 45,
-                      fit: BoxFit.cover,
-                    ),
+            child: GestureDetector(onTap: (){
+              Navigator.pushNamed(context, UserPage.id);
+            },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22.5),
+                child: member.img_url.isEmpty
+                    ? Image(
+                        image: AssetImage("assets/images/person.png"),
+                        width: 45,
+                        height: 45,
+                        fit: BoxFit.cover,
+                      )
+                    : Image.network(
+                        member.img_url,
+                        width: 45,
+                        height: 45,
+                        fit: BoxFit.cover,
+                      ),
+              ),
             ),
           ),
           SizedBox(
@@ -157,9 +174,13 @@ class _MySearchPageState extends State<MySearchPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                member.fullname,
-                style: TextStyle(fontWeight: FontWeight.bold),
+              GestureDetector(onTap: (){
+                Navigator.pushNamed(context, UserPage.id);
+              },
+                child: Text(
+                  member.fullname,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
               SizedBox(
                 height: 3,
@@ -175,7 +196,11 @@ class _MySearchPageState extends State<MySearchPage> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 GestureDetector(
-                  onTap: () {
+                  onTap: () async{
+                    await service.showNotification(
+                        id: 0,
+                        title: 'Firdavs',
+                        body: 'followed you');
                     if (member.followed) {
                       _apiUnFollowMember(member);
                     } else {
@@ -200,5 +225,19 @@ class _MySearchPageState extends State<MySearchPage> {
         ],
       ),
     );
+  }
+
+  void listenToNotification() =>
+      service.onNotificationClick.stream.mapTo(onNoticationListener);
+
+  void onNoticationListener(Member member) {
+    if (member.fullname != null && member.fullname.isEmpty) {
+      print('payload ${member.fullname}');
+
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: ((context) => SecondScreen(payload: member.fullname))));
+    }
   }
 }

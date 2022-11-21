@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'my_feed_page.dart';
@@ -17,12 +18,18 @@ class _HomePageState extends State<HomePage> {
 
   PageController? _pageController;
   int _currentTap = 0;
+  static final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _pageController = PageController();
+  }
+
+  _InitNotification(){
+
   }
 
   @override

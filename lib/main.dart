@@ -1,9 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_myinsta/pages/home_page.dart';
 import 'package:flutter_myinsta/pages/signin_page.dart';
 import 'package:flutter_myinsta/pages/signup_page.dart';
 import 'package:flutter_myinsta/pages/splash_page.dart';
+import 'package:flutter_myinsta/pages/user_page.dart';
 import 'package:flutter_myinsta/services/notif_service.dart';
 
 
@@ -12,7 +14,10 @@ void main() async{
   await Firebase.initializeApp();
   await NotifService.init();
 
-  runApp(const MyApp());
+
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp,DeviceOrientation.portraitDown]).then((_){
+    runApp(const MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -32,6 +37,7 @@ class MyApp extends StatelessWidget {
         SignInPage.id: (context) => SignInPage(),
         SignUpPage.id: (context) => SignUpPage(),
         HomePage.id: (context) => HomePage(),
+        UserPage.id: (context) => UserPage()
       },
     );
   }

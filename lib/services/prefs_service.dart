@@ -9,7 +9,7 @@ class Prefs {
 
   static Future<String> loadFCM() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('fcm_token');
-    return token!;
+    String token = prefs.getString('fcm_token')!;
+    return token;
   }
 }

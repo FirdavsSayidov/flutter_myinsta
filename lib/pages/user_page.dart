@@ -12,96 +12,30 @@ import '../services/db_service.dart';
 import '../services/file_service.dart';
 import '../services/utils_service.dart';
 
-class MyProfilePage extends StatefulWidget {
-  const MyProfilePage({Key? key}) : super(key: key);
+class UserPage extends StatefulWidget {
+  const UserPage({Key? key}) : super(key: key);
+  static const String id = 'UserPage';
+
 
   @override
-  State<MyProfilePage> createState() => _MyProfilePageState();
+  State<UserPage> createState() => _UserPageState();
 }
 
-class _MyProfilePageState extends State<MyProfilePage> {
+class _UserPageState extends State<UserPage> {
   bool isLoading = false;
   int axisCount = 2;
   List<Post> items = [];
-  File? _image;
   String fullname = "", email = "", img_url = "";
   int count_posts = 0, count_followers = 0, count_following = 0;
-  final ImagePicker _picker = ImagePicker();
-
-  _imgFromGallery() async {
-    XFile? image =
-        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
-    print(image!.path.toString());
-    setState(() {
-      _image = File(image.path);
-    });
-    _apiChangePhoto();
-  }
-
-  _imgFromCamera() async {
-    XFile? image =
-        await _picker.pickImage(source: ImageSource.camera, imageQuality: 50);
-    print(image!.path.toString());
-    setState(() {
-      _image = File(image.path);
-    });
-    _apiChangePhoto();
-  }
-
-  void _apiChangePhoto() {
-    if (_image == null) return;
-    setState(() {
-      isLoading = true;
-    });
-    FileService.uploadUserImage(_image!).then((downloadUrl) => {
-          _apiUpdateUser(downloadUrl),
-        });
-  }
-
-  _apiUpdateUser(String downloadUrl) async {
-    Member member = await DBService.loadMember();
-    member.img_url = downloadUrl;
-    await DBService.updateMember(member);
-    _apiLoadMember();
-  }
-
-  void _showPicker(context) {
-    showModalBottomSheet(
-        context: context,
-        builder: (BuildContext bc) {
-          return SafeArea(
-            child: Container(
-              child: Wrap(
-                children: <Widget>[
-                  ListTile(
-                      leading: const Icon(Icons.photo_library),
-                      title: const Text('Pick Photo'),
-                      onTap: () {
-                        _imgFromGallery();
-                        Navigator.of(context).pop();
-                      }),
-                  ListTile(
-                    leading: const Icon(Icons.photo_camera),
-                    title: const Text('Take Photo'),
-                    onTap: () {
-                      _imgFromCamera();
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              ),
-            ),
-          );
-        });
-  }
 
   void _apiLoadMember() {
     setState(() {
       isLoading = true;
     });
     DBService.loadMember().then((value) => {
-          _showMemberInfo(value),
-        });
+      _showMemberInfo(value),
+
+    });
   }
 
   void _showMemberInfo(Member member) {
@@ -114,11 +48,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
       count_followers = member.followers_count;
     });
   }
-
   _apiLoadPosts() {
     DBService.loadPosts().then((value) => {
-          _resLoadPosts(value),
-        });
+      _resLoadPosts(value),
+    });
   }
 
   _resLoadPosts(List<Post> posts) {
@@ -128,27 +61,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
     });
   }
 
-  _dialogRemovePost(Post post) async{
-    var result = await Utils.dialogCommon(context, "flutter_myinsta", "Do you want to detele this post?", false);
-    if(result != null && result){
-      setState(() {
-        isLoading = true;
-      });
-      DBService.removePost(post).then((value) => {
-        _apiLoadPosts(),
-      });
-    }
-  }
 
-  _dialogLogout() async{
-    var result = await Utils.dialogCommon(context, "flutter_myinsta", "Do you want to logout?", false);
-    if(result != null && result){
-      setState(() {
-        isLoading = true;
-      });
-      AuthService.signOutUser(context);
-    }
-  }
+
+
 
   @override
   void initState() {
@@ -162,22 +77,19 @@ class _MyProfilePageState extends State<MyProfilePage> {
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
+          leading: IconButton(icon: Icon(Icons.chevron_left,color: Colors.black,size: 30,),
+            onPressed: (){
+              Navigator.pop(context);
+            },
+          ),
           backgroundColor: Colors.white,
           elevation: 0,
           title: Text(
-            "Profile",
+            "User",
             style: TextStyle(
-                color: Colors.black, fontFamily: "Billabong", fontSize: 25),
+                color: Colors.black,fontWeight: FontWeight.w400, fontFamily: "Billabong", fontSize: 30),
           ),
-          actions: [
-            IconButton(
-              onPressed: () {
-                _dialogLogout();
-              },
-              icon: Icon(Icons.exit_to_app),
-              color: Color.fromRGBO(193, 53, 132, 1),
-            )
-          ],
+
         ),
         body: Stack(
           children: [
@@ -189,7 +101,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   //#myphoto
                   GestureDetector(
                       onTap: () {
-                        _showPicker(context);
                       },
                       child: Stack(
                         children: [
@@ -206,34 +117,21 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               borderRadius: BorderRadius.circular(35),
                               child: img_url == null || img_url.isEmpty
                                   ? Image(
-                                      image: AssetImage(
-                                         'assets/images/person.png' ),
-                                      width: 70,
-                                      height: 70,
-                                      fit: BoxFit.cover,
-                                    )
+                                image: AssetImage(
+                                    'assets/images/person.png' ),
+                                width: 70,
+                                height: 70,
+                                fit: BoxFit.cover,
+                              )
                                   : Image.network(
-                                      img_url,
-                                      width: 70,
-                                      height: 70,
-                                      fit: BoxFit.cover,
-                                    ),
+                                img_url,
+                                width: 70,
+                                height: 70,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
-                          Container(
-                            width: 80,
-                            height: 80,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Icon(
-                                  Icons.add_circle,
-                                  color: Colors.purple,
-                                )
-                              ],
-                            ),
-                          ),
+
                         ],
                       )),
 
@@ -396,35 +294,34 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
   Widget _itemOfPost(Post post) {
     return GestureDetector(
-      onLongPress: (){
-        _dialogRemovePost(post);
-      },
-      child: Container(
-        margin: EdgeInsets.all(5),
-        child: Column(
-          children: [
-            Expanded(
-              child: CachedNetworkImage(
-                width: double.infinity,
-                imageUrl: post.img_post,
-                placeholder: (context, url) => Center(
-                  child: CircularProgressIndicator(),
+        onLongPress: (){
+        },
+        child: Container(
+          margin: EdgeInsets.all(5),
+          child: Column(
+            children: [
+              Expanded(
+                child: CachedNetworkImage(
+                  width: double.infinity,
+                  imageUrl: post.img_post,
+                  placeholder: (context, url) => Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
+                  fit: BoxFit.cover,
                 ),
-                errorWidget: (context, url, error) => Icon(Icons.error),
-                fit: BoxFit.cover,
               ),
-            ),
-            SizedBox(
-              height: 3,
-            ),
-            Text(
-              post.caption,
-              style: TextStyle(color: Colors.black87.withOpacity(0.7)),
-              maxLines: 2,
-            )
-          ],
-        ),
-      )
+              SizedBox(
+                height: 3,
+              ),
+              Text(
+                post.caption,
+                style: TextStyle(color: Colors.black87.withOpacity(0.7)),
+                maxLines: 2,
+              )
+            ],
+          ),
+        )
     );
   }
 }
